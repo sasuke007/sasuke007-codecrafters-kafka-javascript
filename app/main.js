@@ -16,15 +16,15 @@ class Header {
 }
 
 class Response {
-    constructor(messageSize,errorCode,responseBody) {
+    constructor(messageSize, errorCode, responseBody) {
         this.messageSize = messageSize;
         this.errorCode = errorCode;
         this.responseBody = responseBody;
     }
 }
 
-class ResponseBody{
-    constructor(apiKey,maxVersion) {
+class ResponseBody {
+    constructor(apiKey, maxVersion) {
         this.apiKey = apiKey;
         this.maxVersion = maxVersion;
     }
@@ -37,6 +37,7 @@ class RequestBody {
         this.body = body;
     }
 }
+
 // Parse request
 const parseRequest = (data) => {
     const messageSize = data.readUInt32BE(0);
@@ -71,9 +72,12 @@ const processApiVersionRequest = (requestBody) => {
         toBufferFromInt16BE(errorCode),
         toBufferFromInt16BE(requestApiKey),
         toBufferFromInt16BE(minVersion),
-        toBufferFromInt16BE(maxVersion)
+        toBufferFromInt16BE(maxVersion),
+        NULL_TAG,
+        toBufferFromInt16BE(throttleTime),
+        NULL_TAG
     ]);
-    return Buffer.concat([toBufferFromInt32BE(correlationId),toBufferFromInt32BE(responseBuffer.length), responseBuffer]);
+    return Buffer.concat([toBufferFromInt32BE(correlationId), toBufferFromInt32BE(responseBuffer.length), responseBuffer]);
 }
 
 const errorHandler = (requestBody) => {
@@ -92,12 +96,12 @@ const requestProcessor = ({requestApiKey, requestApiVersion, correlationId}) => 
 const server = net.createServer((connection) => {
     connection.on("data", (data) => {
         try {
-            console.log("Request:",data.toString("hex"));
+            console.log("Request:", data.toString("hex"));
             const requestBody = parseRequest(data);
             const response = requestProcessor(requestBody);
             connection.write(response);
             console.log("ApiVersions response sent:", response.toString("hex"));
-        }catch(error) {
+        } catch (error) {
             console.log(error);
         }
     });
