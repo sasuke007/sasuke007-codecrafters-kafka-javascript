@@ -45,8 +45,7 @@ const processApiVersionRequest = (requestBody) => {
         toBufferFromInt16BE(requestApiKey),
         toBufferFromInt16BE(minVersion),
         toBufferFromInt16BE(maxVersion),
-        toBufferFromInt32BE(throttleTime),
-        NULL_TAG,]);
+        toBufferFromInt32BE(throttleTime)]);
     return Buffer.concat([toBufferFromInt32BE(responseBuffer.length), responseBuffer]);
 }
 
