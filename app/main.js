@@ -43,7 +43,7 @@ const parseRequest = (data) => {
     const requestApiKey = data.readUInt16BE(4);
     const requestApiVersion = data.readUInt16BE(6);
     const correlationId = data.readUInt32BE(8);
-    return new RequestBody(messageSize, new Header(requestApiKey, requestApiVersion, correlationId), null);
+    return {requestApiKey, requestApiVersion, correlationId};
 }
 
 const toBufferFromInt8 = (value) => Buffer.from([value]);
@@ -61,9 +61,7 @@ const toBufferFromInt32BE = (value) => {
 };
 
 const processApiVersionRequest = (requestBody) => {
-    const requestApiKey = requestBody.header.requestApiKey;
-    const correlationId = requestBody.header.correlationId;
-    const requestApiVersion = requestBody.header.requestApiVersion;
+    const {requestApiKey, requestApiVersion, correlationId} = requestBody;
     const valid = 0 >= requestApiVersion && requestApiVersion <= 4;
     const errorCode = valid ? 0 : UNSUPPORTED;
     const maxVersion = 4;
@@ -82,12 +80,12 @@ const errorHandler = (requestBody) => {
     let buffer = new Buffer([]);
 }
 
-const requestProcessor = (requestBody) => {
-    switch (requestBody.header.requestApiKey) {
+const requestProcessor = ({requestApiKey, requestApiVersion, correlationId}) => {
+    switch (requestApiKey) {
         case 18:
-            return processApiVersionRequest(requestBody);
+            return processApiVersionRequest({requestApiKey, requestApiVersion, correlationId});
         default:
-            return errorHandler(requestBody);
+            return errorHandler({requestApiKey, requestApiVersion, correlationId});
     }
 }
 // Uncomment this block to pass the first stage
