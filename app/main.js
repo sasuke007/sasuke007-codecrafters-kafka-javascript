@@ -8,7 +8,7 @@ const server = net.createServer((connection) => {
     let arr = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 7]);
     connection.on("data", (data ) => {
         // console.log(data.subarray(8, 13));
-        connection.write(data.subarray(8, 13));
+        connection.write(data.subarray(8, 12));
     });
 });
 
