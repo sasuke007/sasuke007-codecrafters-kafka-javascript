@@ -39,12 +39,12 @@ const processApiVersionRequest = (requestBody) => {
     const maxVersion = 4;
     const minVersion = 0;
     const throttleTime = 0;
-    const responseBuffer = Buffer.concat([toBufferFromInt32BE(correlationId),
+    const responseBuffer = Buffer.concat([
         toBufferFromInt16BE(errorCode),
         toBufferFromInt16BE(requestApiKey),
         toBufferFromInt16BE(minVersion),
         toBufferFromInt16BE(maxVersion),     ]);
-    return Buffer.concat([toBufferFromInt32BE(responseBuffer.length), responseBuffer]);
+    return Buffer.concat([toBufferFromInt32BE(correlationId),toBufferFromInt32BE(responseBuffer.length), responseBuffer]);
 }
 
 const errorHandler = (requestBody) => {
