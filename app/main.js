@@ -101,6 +101,7 @@ const server = net.createServer((connection) => {
             const response = requestProcessor(requestBody);
             connection.write(response);
             console.log("ApiVersions response sent:", response.toString("hex"));
+            connection.end(()=>{console.log("Terminated")})
         } catch (error) {
             console.log(error);
         }
