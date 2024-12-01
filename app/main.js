@@ -1,5 +1,5 @@
 import net from "net";
-import {Header, RequestBody} from "./request.js";
+
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 // console.log("Logs from your program will appear here!");
@@ -7,6 +7,36 @@ import {Header, RequestBody} from "./request.js";
 const UNSUPPORTED = 35;
 const NULL_TAG = Buffer.from([0, 0]);
 
+class Header {
+    constructor(requestApiKey, requestApiVersion, correlationId) {
+        this.requestApiKey = requestApiKey;
+        this.requestApiVersion = requestApiVersion;
+        this.correlationId = correlationId;
+    }
+}
+
+class Response {
+    constructor(messageSize,errorCode,responseBody) {
+        this.messageSize = messageSize;
+        this.errorCode = errorCode;
+        this.responseBody = responseBody;
+    }
+}
+
+class ResponseBody{
+    constructor(apiKey,maxVersion) {
+        this.apiKey = apiKey;
+        this.maxVersion = maxVersion;
+    }
+}
+
+class RequestBody {
+    constructor(messageSize, header, body) {
+        this.messageSize = messageSize;
+        this.header = header;
+        this.body = body;
+    }
+}
 // Parse request
 const parseRequest = (data) => {
     const messageSize = data.readUInt32BE(0);
@@ -50,7 +80,6 @@ const processApiVersionRequest = (requestBody) => {
 
 const errorHandler = (requestBody) => {
     let buffer = new Buffer([]);
-
 }
 
 const requestProcessor = (requestBody) => {
