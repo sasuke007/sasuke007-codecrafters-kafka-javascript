@@ -40,10 +40,10 @@ class RequestBody {
 
 // Parse request
 const parseRequest = (data) => {
-    const messageSize = data.readUInt32BE(0);
-    const requestApiKey = data.readUInt16BE(4);
-    const requestApiVersion = data.readUInt16BE(6);
-    const correlationId = data.readUInt32BE(8);
+    const messageSize = data.readInt32BE(0);
+    const requestApiKey = data.readInt16BE(4);
+    const requestApiVersion = data.readInt16BE(6);
+    const correlationId = data.readInt32BE(8);
     return {requestApiKey, requestApiVersion, correlationId};
 }
 
@@ -63,21 +63,33 @@ const toBufferFromInt32BE = (value) => {
 
 const processApiVersionRequest = (requestBody) => {
     const {requestApiKey, requestApiVersion, correlationId} = requestBody;
-    const valid = 0 >= requestApiVersion && requestApiVersion <= 4;
+    const valid = requestApiVersion >=0  && requestApiVersion <= 4;
     const errorCode = valid ? 0 : UNSUPPORTED;
     const maxVersion = 4;
     const minVersion = 0;
     const throttleTime = 0;
     const responseBuffer = Buffer.concat([
         toBufferFromInt16BE(errorCode),
+        toBufferFromInt8(2), // Number of API keys (hardcoded to 2 for this example)
+
         toBufferFromInt16BE(requestApiKey),
-        toBufferFromInt16BE(minVersion),
-        toBufferFromInt16BE(maxVersion),
+
+        toBufferFromInt16BE(minVersion), // Min version
+
+        toBufferFromInt16BE(maxVersion), // Max version
+
+        toBufferFromInt16BE(4), // ApiVersions key
+
+        toBufferFromInt16BE(minVersion), // Min version for ApiVersions
+
+        toBufferFromInt16BE(maxVersion), // Max version for ApiVersions
+
         NULL_TAG,
-        toBufferFromInt16BE(throttleTime),
+        toBufferFromInt32BE(throttleTime),
         NULL_TAG
     ]);
-    return Buffer.concat([toBufferFromInt32BE(correlationId), toBufferFromInt32BE(responseBuffer.length), responseBuffer]);
+    const size = toBufferFromInt32BE(correlationId).length + responseBuffer.length;
+    return Buffer.concat([toBufferFromInt32BE(size),toBufferFromInt32BE(correlationId), responseBuffer]);
 }
 
 const errorHandler = (requestBody) => {
