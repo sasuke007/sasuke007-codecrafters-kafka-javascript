@@ -77,7 +77,7 @@ const processApiVersionRequest = (requestBody) => {
 }
 
 const errorHandler = (requestBody) => {
-    let buffer = new Buffer([]);
+    console.log("error handler");
 }
 
 const requestProcessor = ({requestApiKey, requestApiVersion, correlationId}) => {
@@ -92,6 +92,7 @@ const requestProcessor = ({requestApiKey, requestApiVersion, correlationId}) => 
 const server = net.createServer((connection) => {
     connection.on("data", (data) => {
         try {
+            console.log("Request:",data.toString("hex"));
             const requestBody = parseRequest(data);
             const response = requestProcessor(requestBody);
             connection.write(response);
