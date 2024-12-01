@@ -41,6 +41,7 @@ const processApiVersionRequest = (requestBody) => {
     const throttleTime = 0;
     const responseBuffer = Buffer.concat([toBufferFromInt32BE(correlationId),
         toBufferFromInt16BE(errorCode),
+        toBufferFromInt8(1),
         toBufferFromInt16BE(requestApiKey),
         toBufferFromInt16BE(minVersion),
         toBufferFromInt16BE(maxVersion),
