@@ -91,9 +91,17 @@ const requestProcessor = ({requestApiKey, requestApiVersion, correlationId}) => 
 // Uncomment this block to pass the first stage
 const server = net.createServer((connection) => {
     connection.on("data", (data) => {
-        const requestBody = parseRequest(data);
-        const response = requestProcessor(requestBody);
-        connection.write(response);
+        try {
+            const requestBody = parseRequest(data);
+            const response = requestProcessor(requestBody);
+            connection.write(response);
+            console.log("ApiVersions response sent:", response.toString("hex"));
+        }catch(error) {
+            console.log(error);
+        }
+    });
+    connection.on("end", () => {
+        console.log("Client disconnected");
     });
 });
 
