@@ -5,7 +5,7 @@ import net from "net";
 // console.log("Logs from your program will appear here!");
 
 const UNSUPPORTED = 35;
-const NULL_TAG = Buffer.from([0, 0]);
+const NULL_TAG = Buffer.from([0]);
 
 class Header {
     constructor(requestApiKey, requestApiVersion, correlationId) {
@@ -70,25 +70,23 @@ const processApiVersionRequest = (requestBody) => {
     const throttleTime = 0;
     const responseBuffer = Buffer.concat([
         toBufferFromInt16BE(errorCode),
-        toBufferFromInt8(2), // Number of API keys (hardcoded to 2 for this example)
-
+        toBufferFromInt8(3), // Number of API keys (hardcoded to 2 for this example)
         toBufferFromInt16BE(requestApiKey),
-
         toBufferFromInt16BE(minVersion), // Min version
-
-        toBufferFromInt16BE(maxVersion), // Max version
-
-        toBufferFromInt16BE(4), // ApiVersions key
-
-        toBufferFromInt16BE(minVersion), // Min version for ApiVersions
-
-        toBufferFromInt16BE(maxVersion), // Max version for ApiVersions
-
+        toBufferFromInt16BE(maxVersion),
         NULL_TAG,
+        toBufferFromInt16BE(75), // ApiVersions key
+        toBufferFromInt16BE(0), // Min version for ApiVersions
+        toBufferFromInt16BE(0),
+        NULL_TAG,// Max version for ApiVersions
         toBufferFromInt32BE(throttleTime),
         NULL_TAG
     ]);
     const size = toBufferFromInt32BE(correlationId).length + responseBuffer.length;
+    console.log("size",size);
+    console.log("header size",toBufferFromInt32BE(correlationId).length);
+    console.log("body size",responseBuffer.length);
+    console.log("null tag size",NULL_TAG.length);
     return Buffer.concat([toBufferFromInt32BE(size),toBufferFromInt32BE(correlationId), responseBuffer]);
 }
 
@@ -111,7 +109,7 @@ const server = net.createServer((connection) => {
             console.log("Request:", data.toString("hex"));
             const requestBody = parseRequest(data);
             const response = requestProcessor(requestBody);
-            connection.write(response)
+            connection.write(response);
             console.log("ApiVersions response sent:", response.toString("hex"));
         } catch (error) {
             console.log(error);
